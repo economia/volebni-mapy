@@ -1,0 +1,17 @@
+{
+  "name": "volebni-mapy",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "CC-BY-SA-NC",
+  "dependencies": {
+    "async": "~0.2.9",
+    "stylus": "~0.38.0",
+    "request": "~2.27.0",
+    "uglify-js": "~2.4.0"
+  }
+}
