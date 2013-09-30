@@ -34,3 +34,14 @@ selectLayer = (id) ->
 
 
 selectLayer years.length - 1
+opts =
+    min: 0
+    max: years.length - 1
+    value: years.length - 1
+    slide: (evt, ui) ->
+        selectLayer ui.value
+console.log opts
+$slider = $ "<div></div>"
+    ..addClass "slider"
+    ..appendTo $ \body
+    ..slider opts

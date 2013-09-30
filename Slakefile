@@ -8,10 +8,12 @@ externalScripts =
     \http://service.ihned.cz/js/leaflet/utfgrid.simple.js
     \http://service.ihned.cz/js/jquery.min.js
     \http://service.ihned.cz/js/tooltip/v1.1.2.min.js
+    \http://service.ihned.cz/js/jq-ui/v1.10.3.autocomplete.slider.min.js
 
 externalStyles =
     \http://service.ihned.cz/js/tooltip/v1.1.2.css
     \http://service.ihned.cz/js/leaflet/v0.6.4.css
+    \http://service.ihned.cz/js/jq-ui/v1.10.3.autocomplete.slider.min.css
 
 deferScripts = <[ base.js ]>
 gzippable = <[ ]>
