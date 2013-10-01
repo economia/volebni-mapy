@@ -4,7 +4,7 @@ map = L.map do
     *   minZoom: 2
         maxZoom: 5
         zoom: 2
-        center: [-70,-160]
+        center: [-55,-143]
         crs: L.CRS.Simple
 years = [1996 1998 2002 2006 2010]
 firstYearIndex = years.length - 1
