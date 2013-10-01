@@ -14,7 +14,13 @@ layers = years.map (year) ->
 grids = years.map (year) ->
     grid = new L.UtfGrid "../data/kscm-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
-            str = "<b>#{e.data.name}</b><br />Volební výsledek #{e.data.abbr} v roce #{e.data.year}: #{(e.data.percent * 100).toFixed 2}%  (#{e.data.count} hlasů)<br />"
+            str = switch
+            | e.data.id == "592935" and year <= 1998
+                "<b>#{e.data.name}</b><br />V roce #{e.data.year} zde nikdo nevolil"
+            | e.data.count is not null
+                "<b>#{e.data.name}</b><br />Volební výsledek #{e.data.abbr} v roce #{e.data.year}: #{(e.data.percent * 100).toFixed 2}%  (#{e.data.count} hlasů)<br />"
+            | otherwise
+                "<b>#{e.data.name}</b><br />Volební výsledek v roce #{e.data.year} se nepodařilo zjistit"
             tooltip.display str
         ..on \mouseout ->
             tooltip.hide!
