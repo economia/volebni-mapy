@@ -1,4 +1,5 @@
 @import prefixes
+@import colors
 body
     margin 0px
     line-height 1.3em
@@ -14,3 +15,14 @@ body
         position absolute
         top 20px
         left 70px
+        &.ui-slider
+            border 1px solid #333
+        .ui-slider-handle
+            border 1px solid darken(HNBlue, 40%)
+            background HNBlue
+            transition background 0.5s
+            &.ui-state-hover
+                background darken(HNBlue, 20%)
+            &.ui-state-active
+                background darken(HNBlue, 40%)
+
