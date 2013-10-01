@@ -7,6 +7,7 @@ map = L.map do
         center: [-70,-160]
         crs: L.CRS.Simple
 years = [1996 1998 2002 2006 2010]
+firstYearIndex = years.length - 1
 currentLayer = null
 layers = years.map (year) ->
     L.tileLayer "../data/kscm-#year/{z}/{x}/{y}.png"
@@ -28,20 +29,25 @@ selectLayer = (id) ->
             300
     map.addLayer layers[id]
     map.addLayer grids[id]
+    $year.html years[id]
     currentLayer :=
         map: layers[id]
         grid: grids[id]
 
 
-selectLayer years.length - 1
 opts =
     min: 0
     max: years.length - 1
-    value: years.length - 1
+    value: firstYearIndex
     slide: (evt, ui) ->
         selectLayer ui.value
-console.log opts
 $slider = $ "<div></div>"
     ..addClass "slider"
     ..appendTo $ \body
     ..slider opts
+
+$year = $ "<span></span>"
+    ..addClass "year"
+    ..appendTo $ \body
+
+selectLayer firstYearIndex

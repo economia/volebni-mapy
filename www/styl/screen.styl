@@ -10,10 +10,11 @@ body
         left 0px
         bottom 0px
         width 100%
+    sliderTop = 13px
     .slider
-        width 500px
+        width 460px
         position absolute
-        top 20px
+        top (sliderTop + 7px)
         left 70px
         &.ui-slider
             border 1px solid #333
@@ -26,3 +27,12 @@ body
             &.ui-state-active
                 background darken(HNBlue, 40%)
 
+    .year
+        display block
+        padding 4px 10px
+        background white
+        border 1px solid #333
+        position absolute
+        top sliderTop
+        left 569px
+        border-radius 4px
