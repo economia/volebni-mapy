@@ -9,9 +9,9 @@ map = L.map do
 years = [1996 1998 2002 2006 2010]
 firstYearIndex = years.length - 1
 currentLayer = null
-layers = years.map (year) ->
+layers = for year in years
     L.tileLayer "../data/kscm-#year/{z}/{x}/{y}.png"
-grids = years.map (year) ->
+grids = for let year in years
     grid = new L.UtfGrid "../data/kscm-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
             str = switch
