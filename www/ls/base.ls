@@ -63,7 +63,7 @@ $gradientContainer = $ "<div></div>"
     ..appendTo $body
 colors = <[#FFF5F0 #FEE0D2 #FCBBA1 #FC9272 #FB6A4A #EF3B2C #CB181D #A50F15 #67000D]>
 values = [0 0.04 0.08 0.12 0.18 0.22 0.24 0.4 0.7]
-colors.forEach (color, index) ->
+for color, index in colors
     value = values[index]
     ele = $ "<div></div>"
         ..css \background color
