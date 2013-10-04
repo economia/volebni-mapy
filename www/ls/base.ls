@@ -1,11 +1,10 @@
 tooltip = new Tooltip!
 map = L.map do
     *   'map'
-    *   minZoom: 2
-        maxZoom: 5
-        zoom: 2
-        center: [-66,-138]
-        crs: L.CRS.Simple
+    *   minZoom: 6,
+        maxZoom: 10,
+        zoom: 6,
+        center: [50, 15]
 years = [1998 2002 2006 2010]
 firstYearIndex = years.length - 1
 currentLayer = null
