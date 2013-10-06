@@ -3,8 +3,8 @@ map = L.map do
     *   'map'
     *   minZoom: 6,
         maxZoom: 10,
-        zoom: 6,
-        center: [50, 15]
+        zoom: 7,
+        center: [49.7, 15.5]
 years = [1998 2002 2006 2010]
 firstYearIndex = years.length - 1
 currentLayer = null
