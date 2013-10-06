@@ -10,6 +10,7 @@ firstYearIndex = years.length - 1
 currentLayer = null
 layers = for year in years
     L.tileLayer "../data/protesty-#year/{z}/{x}/{y}.png"
+$ document .on \mouseout \#map -> tooltip.hide!
 grids = for let year in years
     grid = new L.UtfGrid "../data/protesty-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
