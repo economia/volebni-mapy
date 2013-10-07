@@ -20,13 +20,17 @@ mapLayer = L.tileLayer do
 map.on \zoomend ->
     | map.getZoom! >= 10 => map.addLayer mapLayer
     | otherwise         => map.removeLayer mapLayer
-$ document .on \mouseout \#map -> tooltip.hide!
+$ document .on \mouseout \#map ->
+    clearTimeout longTextTimeout if longTextTimeout
+    tooltip.hide!
+longTextTimeout = null
 grids = for let year in years
     grid = new L.UtfGrid "../data/protesty-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
             {name, year, partyResults} = e.data
-            str = "<b>#{name}</b>, rok #{year}<br />"
-            str += switch
+            longText = "<b>#{name}</b>, rok #{year}<br />"
+            shortText = longText
+            longText += switch
             | e.data.id == "592935" and year <= 1998
                 "V roce #{e.data.year} zde nikdo nevolil"
             | otherwise
@@ -40,11 +44,17 @@ grids = for let year in years
                         countSum += count
                         "#{abbr}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
                 out.unshift "<b>Celkem: #{(percentSum * 100).toFixed 2}%</b> (#{countSum} hlasů)"
+                shortText += out[0]
                 out.join "<br />"
 
-            tooltip.display str
+            tooltip.display shortText
+            clearTimeout longTextTimeout if longTextTimeout
+            longTextTimeout := setTimeout do
+                -> tooltip.display longText
+                1200
         ..on \mouseout ->
             tooltip.hide!
+            clearTimeout longTextTimeout if longTextTimeout
 
 selectLayer = (id) ->
     if currentLayer
