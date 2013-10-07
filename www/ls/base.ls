@@ -134,6 +134,7 @@ $ '.search form' .on \submit (evt) ->
     geocoder ?:= new google.maps.Geocoder();
     evt.preventDefault!
     address = $ '.search input' .val!
+    _gaq.push ['_trackEvent' 'geocode' address]
     (err) <~ geocode address
     if err
         alert "Bohužel danou adresu se nám nepodařilo nalézt."
