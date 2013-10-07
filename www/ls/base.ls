@@ -111,4 +111,30 @@ drawLegend = (year) ->
         if index >= 5
             ele.addClass \dark
 
+geocoder = null
+geocodeMarker = null
+L.Icon.Default.imagePath = "http://service.ihned.cz/js/leaflet/images"
+geocode = (address, cb) ->
+    (results, status) <~ geocoder.geocode {address}
+    return cb status if status isnt google.maps.GeocoderStatus.OK
+    return cb 'no-results' unless results?.length > 0
+    result = results[0]
+    latlng = new L.LatLng do
+        result.geometry.location.lat!
+        result.geometry.location.lng!
+    map.setView latlng, 10
+    if geocodeMarker == null
+        geocodeMarker := L.marker latlng
+            ..on \mouseover -> map.removeLayer geocodeMarker
+    geocodeMarker
+        ..addTo map
+        ..setLatLng latlng
+    cb null
+$ '.search button' .on \click (evt) ->
+    geocoder ?:= new google.maps.Geocoder();
+    evt.preventDefault!
+    address = $ '.search input' .val!
+    (err) <~ geocode address
+    if err
+        alert "Bohužel danou adresu se nám nepodařilo nalézt."
 selectLayer firstYearIndex
