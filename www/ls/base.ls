@@ -18,7 +18,7 @@ mapLayer = L.tileLayer do
         opacity: 0.65
         attribution: 'mapová data &copy; přispěvatelé OpenStreetMap, obrazový podkres <a target="_blank" href="http://ihned.cz">IHNED.cz</a>'
 map.on \zoomend ->
-    | map.getZoom! >= 9 => map.addLayer mapLayer
+    | map.getZoom! >= 10 => map.addLayer mapLayer
     | otherwise         => map.removeLayer mapLayer
 $ document .on \mouseout \#map -> tooltip.hide!
 grids = for let year in years
