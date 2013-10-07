@@ -130,7 +130,7 @@ geocode = (address, cb) ->
         ..addTo map
         ..setLatLng latlng
     cb null
-$ '.search button' .on \click (evt) ->
+$ '.search form' .on \submit (evt) ->
     geocoder ?:= new google.maps.Geocoder();
     evt.preventDefault!
     address = $ '.search input' .val!
