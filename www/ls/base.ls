@@ -10,6 +10,10 @@ firstYearIndex = years.length - 1
 currentLayer = null
 layers = for year in years
     L.tileLayer "../data/protesty-#year/{z}/{x}/{y}.png"
+mapLayer = L.tileLayer "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png" zIndex: 2, opacity: 0.65
+map.on \zoomend ->
+    | map.getZoom! >= 9 => map.addLayer mapLayer
+    | otherwise         => map.removeLayer mapLayer
 $ document .on \mouseout \#map -> tooltip.hide!
 grids = for let year in years
     grid = new L.UtfGrid "../data/protesty-#year/{z}/{x}/{y}.json", useJsonP: no
