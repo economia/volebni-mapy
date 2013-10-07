@@ -9,8 +9,14 @@ years = [1998 2002 2006 2010]
 firstYearIndex = years.length - 1
 currentLayer = null
 layers = for year in years
-    L.tileLayer "../data/protesty-#year/{z}/{x}/{y}.png"
-mapLayer = L.tileLayer "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png" zIndex: 2, opacity: 0.65
+    L.tileLayer do
+        *   "../data/protesty-#year/{z}/{x}/{y}.png"
+        *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
+mapLayer = L.tileLayer do
+    *   "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png"
+    *   zIndex: 2
+        opacity: 0.65
+        attribution: 'mapová data &copy; přispěvatelé OpenStreetMap, obrazový podkres <a target="_blank" href="http://ihned.cz">IHNED.cz</a>'
 map.on \zoomend ->
     | map.getZoom! >= 9 => map.addLayer mapLayer
     | otherwise         => map.removeLayer mapLayer
