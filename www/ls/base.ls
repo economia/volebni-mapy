@@ -29,7 +29,7 @@ grids = for let year in years
                         percentSum += percent
                         countSum += count
                         "#{abbr}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
-                out.unshift "Celkem: #{(percentSum * 100).toFixed 2}% (#{countSum} hlasů)"
+                out.unshift "<b>Celkem: #{(percentSum * 100).toFixed 2}%</b> (#{countSum} hlasů)"
                 out.join "<br />"
 
             tooltip.display str
