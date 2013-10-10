@@ -93,7 +93,7 @@ $gradientContainer = $ "<div></div>"
     ..addClass \gradientContainer
     ..appendTo $body
 
-colors = <[#FFF5F0 #FEE0D2 #FCBBA1 #FC9272 #FB6A4A #EF3B2C #CB181D #A50F15 #67000D]>
+colors = <[#FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506]>
 drawLegend = (year) ->
     $gradientContainer.empty!
     values = switch year
