@@ -5,13 +5,17 @@ map = L.map do
         maxZoom: 10,
         zoom: 7,
         center: [49.7, 15.5]
-years = [1998 2002 2006 2010]
-firstYearIndex = years.length - 1
+
+allYears = years = [1996 1998 2002 2006 2010]
+currentYearOptions = allYears
+currentYear = 2010
+currentParty = \ods
 currentLayer = null
-layers = for year in years
+getLayer = (party, year) ->
     L.tileLayer do
-        *   "../data/protesty-#year/{z}/{x}/{y}.png"
+        *   "../data/#party-#year/{z}/{x}/{y}.png"
         *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
+
 mapLayer = L.tileLayer do
     *   "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png"
     *   zIndex: 2
@@ -20,43 +24,36 @@ mapLayer = L.tileLayer do
 map.on \zoomend ->
     | map.getZoom! >= 10 => map.addLayer mapLayer
     | otherwise         => map.removeLayer mapLayer
-$ document .on \mouseout \#map ->
-    clearTimeout longTextTimeout if longTextTimeout
-    tooltip.hide!
-longTextTimeout = null
-grids = for let year in years
-    grid = new L.UtfGrid "../data/protesty-#year/{z}/{x}/{y}.json", useJsonP: no
+
+getGrid = (party, year) ->
+    new L.UtfGrid "../data/#party-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
             {name, year, partyResults} = e.data
-            longText = "<b>#{name}</b>, rok #{year}<br />"
-            shortText = longText
-            longText += switch
+            txt = switch
             | e.data.id == "592935" and year <= 1998
                 "V roce #{e.data.year} zde nikdo nevolil"
             | otherwise
-                percentSum = 0
-                countSum = 0
                 out = for {abbr, percent, count} in partyResults
                     if count is null or count is void
-                        "#{abbr}: zde nekandidovali"
+                        "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
                     else
-                        percentSum += percent
-                        countSum += count
-                        "#{abbr}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
-                out.unshift "<b>Celkem: #{(percentSum * 100).toFixed 2}%</b> (#{countSum} hlasů)"
-                shortText += out[0]
-                out.join "<br />"
+                        "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
 
-            tooltip.display shortText
-            clearTimeout longTextTimeout if longTextTimeout
-            longTextTimeout := setTimeout do
-                -> tooltip.display longText
-                1200
-        ..on \mouseout ->
-            tooltip.hide!
-            clearTimeout longTextTimeout if longTextTimeout
+                out.join ""
+            tooltip.display txt
+        ..on \mouseout -> tooltip.hide!
 
-selectLayer = (id) ->
+selectParty = (party) ->
+    currentParty := party
+    currentYearOptions :=
+        | parties[party].years => that
+        | otherwise            => allYears
+    if currentYear not in currentYearOptions
+        currentYear := currentYearOptions[currentYearOptions.length - 1]
+    updateYearSelector currentYearOptions
+    selectLayer currentParty, currentYear
+
+selectLayer = (party, year) ->
     if currentLayer
         lastLayer = currentLayer
         setTimeout do
@@ -64,21 +61,69 @@ selectLayer = (id) ->
                 map.removeLayer lastLayer.map
                 map.removeLayer lastLayer.grid
             300
-    map.addLayer layers[id]
-    map.addLayer grids[id]
-    $year.html years[id]
-    drawLegend years[id]
+    layer = getLayer party, year
+    grid  = getGrid party, year
+
+    map.addLayer layer
+    map.addLayer grid
+    $year.html year
+    drawLegend party
     currentLayer :=
-        map: layers[id]
-        grid: grids[id]
+        map: layer
+        grid: grid
 
 
 opts =
     min: 0
     max: years.length - 1
-    value: firstYearIndex
+    value: years[years.length - 1]
     slide: (evt, ui) ->
-        selectLayer ui.value
+        currentYear := currentYearOptions[ui.value]
+        selectLayer currentParty, currentYear
+
+parties =
+    ods:
+        name: \ODS
+        colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
+        values: [0, 0.06, 0.12, 0.18, 0.24, 0.30, 0.36, 0.43, 0.79]
+    cssd:
+        name: \ČSSD
+        colors: <[ #FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506 ]>
+        values: [0, 0.06, 0.12, 0.18, 0.24, 0.3, 0.36, 0.42, 1]
+    kscm:
+        name: \KSČM
+        colors: <[#FFF5F0 #FEE0D2 #FCBBA1 #FC9272 #FB6A4A #EF3B2C #CB181D #A50F15 #67000D ]>
+        values: [0, 0.046, 0.093, 0.139, 0.185, 0.231, 0.278, 0.330, 0.698]
+    vv:
+        name: \VV
+        colors: <[ #F7FBFF #DEEBF7 #C6DBEF #9ECAE1 #6BAED6 #4292C6 #2171B5 #08519C #08306B  ]>
+        values: [0, 0.022, 0.044, 0.066, 0.088, 0.111, 0.133, 0.158, 0.358]
+        years: [2010]
+    kdu:
+        name: "KDU-ČSL"
+        colors: <[#FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506 ]>
+        values: [0, 0.037, 0.075, 0.112, 0.149, 0.187, 0.224, 0.267, 0.819]
+    sz:
+        name: \SZ
+        colors: <[#F7FCF5 #E5F5E0 #C7E9C0 #A1D99B #74C476 #41AB5D #238B45 #006D2C #00441B ]>
+        values: [0, 0.011, 0.022, 0.034, 0.045, 0.057, 0.068, 0.081, 0.33]
+        years: [1998 2002 2006 2010]
+    oda:
+        name: \ODA
+        colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858 ]>
+        values: [0, 0.012, 0.023, 0.035, 0.047, 0.059, 0.070, 0.084, 0.346]
+        years: [1996 2002]
+    top:
+        name: "TOP 09"
+        colors: <[#F7F4F9 #E7E1EF #D4B9DA #C994C7 #DF65B0 #E7298A #CE1256 #980043 #67001F ]>
+        values: [0, 0.030, 0.061, 0.091, 0.121, 0.151, 0.182, 0.216, 0.491]
+        years: [2010]
+    spr:
+        name: "SPR-RSČ"
+        colors: <[#FFF7F3 #FDE0DD #FCC5C0 #FA9FB5 #F768A1 #DD3497 #AE017E #7A0177 #49006A ]>
+        values: [0, 0.021, 0.042, 0.063, 0.084, 0.105, 0.126, 0.15, 0.5]
+        years: [1996 1998]
+
 $body = $ \body
 $slider = $ "<div></div>"
     ..addClass "slider"
@@ -92,15 +137,22 @@ $year = $ "<span></span>"
 $gradientContainer = $ "<div></div>"
     ..addClass \gradientContainer
     ..appendTo $body
+$partySelectorContainer = $ "<div></div>"
+    ..addClass \partySelectorContainer
+    ..appendTo $body
+$partySelector = $ "<select>"
+    ..appendTo $partySelectorContainer
+    ..on \change ->
+        selectParty @value
 
-colors = <[#FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506]>
-drawLegend = (year) ->
+for id, props of parties
+    $ "<option value='#id'>#{props.name}</option>"
+        ..appendTo $partySelector
+$partySelector.chosen!
+
+drawLegend = (party) ->
     $gradientContainer.empty!
-    values = switch year
-        | 1998 => [0 0.10  0.125 0.138 0.150 0.163 0.178 0.2   0.42 ]
-        | 2002 => [0 0.08  0.098 0.112 0.124 0.138 0.157 0.189 0.7  ]
-        | 2006 => [0 0.044 0.059 0.070 0.08  0.091 0.104 0.124 0.52 ]
-        | 2010 => [0 0.287 0.323 0.349 0.374 0.398 0.426 0.465 0.692]
+    {values, colors} = parties[party]
     for color, index in colors
         value = values[index]
         ele = $ "<div></div>"
@@ -110,6 +162,13 @@ drawLegend = (year) ->
 
         if index >= 5
             ele.addClass \dark
+
+updateYearSelector = (years) ->
+    if years.length == 1
+        $slider.addClass \disabled
+    else
+        $slider.removeClass \disabled
+    $slider.slider "option" "max" years.length - 1
 
 geocoder = null
 geocodeMarker = null
@@ -138,4 +197,4 @@ $ '.search form' .on \submit (evt) ->
     (err) <~ geocode address
     if err
         alert "Bohužel danou adresu se nám nepodařilo nalézt."
-selectLayer firstYearIndex
+selectParty currentParty, currentYear

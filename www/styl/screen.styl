@@ -14,12 +14,15 @@ body
         background white
     sliderTop = 13px
     .slider
-        width 460px
+        width 360px
         position absolute
         top (sliderTop + 7px)
         left 70px
         &.ui-slider
             border 1px solid #333
+        &.disabled
+            background transparent
+            border 0px none
         .ui-slider-handle
             border 1px solid darken(HNBlue, 40%)
             background HNBlue
@@ -37,7 +40,7 @@ body
         border 1px solid #333
         position absolute
         top sliderTop
-        left 569px
+        left 469px
         border-radius 4px
         z-index 8000
     .tooltip
@@ -63,3 +66,12 @@ body
                 color #FEE0D2
     .search
         @import search
+
+    .partySelectorContainer
+        position absolute
+        top 15px
+        right 0px
+        width 100px
+        select
+            width 90px
+
