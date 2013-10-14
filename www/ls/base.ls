@@ -2,19 +2,20 @@ tooltip = new Tooltip!
 map = L.map do
     *   'map'
     *   minZoom: 6,
-        maxZoom: 10,
+        maxZoom: 9,
         zoom: 7,
         center: [49.7, 15.5]
 
 allYears = years = [1996 1998 2002 2006 2010]
 currentYearOptions = allYears
 currentYear = 2010
-currentParty = \ods
+currentParty = \vitezove
 currentLayer = null
 getLayer = (party, year) ->
     L.tileLayer do
         *   "../data/#party-#year/{z}/{x}/{y}.png"
         *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
+            zIndex: 1
 
 mapLayer = L.tileLayer do
     *   "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png"
@@ -22,7 +23,7 @@ mapLayer = L.tileLayer do
         opacity: 0.65
         attribution: 'mapová data &copy; přispěvatelé OpenStreetMap, obrazový podkres <a target="_blank" href="http://ihned.cz">IHNED.cz</a>'
 map.on \zoomend ->
-    | map.getZoom! >= 10 => map.addLayer mapLayer
+    | map.getZoom! >= 9 => map.addLayer mapLayer
     | otherwise         => map.removeLayer mapLayer
 
 getGrid = (party, year) ->
@@ -36,6 +37,8 @@ getGrid = (party, year) ->
                 out = for {abbr, percent, count} in partyResults
                     if count is null or count is void
                         "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
+                    if currentParty == \vitezove
+                        "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
                     else
                         "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
 
@@ -82,6 +85,8 @@ opts =
         selectLayer currentParty, currentYear
 
 parties =
+    vitezove:
+        name: "Vítězové voleb"
     ods:
         name: \ODS
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
@@ -153,6 +158,7 @@ $partySelector.chosen!
 drawLegend = (party) ->
     $gradientContainer.empty!
     {values, colors} = parties[party]
+    return if not colors
     for color, index in colors
         value = values[index]
         ele = $ "<div></div>"
