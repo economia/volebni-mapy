@@ -10,14 +10,19 @@ body
         left 0px
         bottom 0px
         width 100%
+    .leaflet-container
+        background white
     sliderTop = 13px
     .slider
-        width 460px
+        width 360px
         position absolute
         top (sliderTop + 7px)
         left 70px
         &.ui-slider
             border 1px solid #333
+        &.disabled
+            background transparent
+            border 0px none
         .ui-slider-handle
             border 1px solid darken(HNBlue, 40%)
             background HNBlue
@@ -35,20 +40,20 @@ body
         border 1px solid #333
         position absolute
         top sliderTop
-        left 569px
+        left 469px
         border-radius 4px
         z-index 8000
     .tooltip
         z-index 9000
     .gradientContainer
         position absolute
-        bottom 0px
+        bottom 16px
         left 0px
-        border-top 1px solid #333
-        border-right 1px solid #333
+        border 1px solid #333
+        z-index 999
         background white
         color #222
-        border-top-right-radius 3px
+        border-radius 3px
         div
             float left
             width 29px
@@ -59,3 +64,16 @@ body
             font-weight bold
             &.dark
                 color #FEE0D2
+    .search
+        @import search
+
+    .partySelectorContainer
+        position absolute
+        top 15px
+        right 0px
+        width 100px
+        select
+            width 90px
+
+        .chosen-search
+            display none

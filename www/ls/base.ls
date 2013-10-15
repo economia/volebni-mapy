@@ -1,31 +1,62 @@
 tooltip = new Tooltip!
 map = L.map do
     *   'map'
-    *   minZoom: 2
-        maxZoom: 5
-        zoom: 2
-        center: [-55,-143]
-        crs: L.CRS.Simple
-years = [1996 1998 2002 2006 2010]
-firstYearIndex = years.length - 1
-currentLayer = null
-layers = for year in years
-    L.tileLayer "../data/kscm-#year/{z}/{x}/{y}.png"
-grids = for let year in years
-    grid = new L.UtfGrid "../data/kscm-#year/{z}/{x}/{y}.json", useJsonP: no
-        ..on \mouseover (e) ->
-            str = switch
-            | e.data.id == "592935" and year <= 1998
-                "<b>#{e.data.name}</b><br />V roce #{e.data.year} zde nikdo nevolil"
-            | e.data.count is not null
-                "<b>#{e.data.name}</b><br />Volební výsledek #{e.data.abbr} v roce #{e.data.year}: #{(e.data.percent * 100).toFixed 2}%  (#{e.data.count} hlasů)<br />"
-            | otherwise
-                "<b>#{e.data.name}</b><br />Volební výsledek v roce #{e.data.year} se nepodařilo zjistit"
-            tooltip.display str
-        ..on \mouseout ->
-            tooltip.hide!
+    *   minZoom: 6,
+        maxZoom: 10,
+        zoom: 7,
+        center: [49.7, 15.5]
 
-selectLayer = (id) ->
+allYears = years = [1996 1998 2002 2006 2010]
+currentYearOptions = allYears
+currentYear = 2010
+currentParty = \vitezove
+currentLayer = null
+getLayer = (party, year) ->
+    L.tileLayer do
+        *   "#party-#year/{z}/{x}/{y}.png"
+        *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
+            zIndex: 1
+
+mapLayer = L.tileLayer do
+    *   "http://ihned-mapy.s3.amazonaws.com/desaturized/{z}/{x}/{y}.png"
+    *   zIndex: 2
+        opacity: 0.65
+        attribution: 'mapová data &copy; přispěvatelé OpenStreetMap, obrazový podkres <a target="_blank" href="http://ihned.cz">IHNED.cz</a>'
+map.on \zoomend ->
+    | map.getZoom! >= 10 => map.addLayer mapLayer
+    | otherwise         => map.removeLayer mapLayer
+
+getGrid = (party, year) ->
+    new L.UtfGrid "#party-#year/{z}/{x}/{y}.json", useJsonP: no
+        ..on \mouseover (e) ->
+            {name, year, partyResults} = e.data
+            txt = switch
+            | e.data.id == "592935" and year <= 1998
+                "V roce #{e.data.year} zde nikdo nevolil"
+            | otherwise
+                out = for {abbr, percent, count} in partyResults
+                    if count is null or count is void
+                        "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
+                    if currentParty == \vitezove
+                        "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+                    else
+                        "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+
+                out.join ""
+            tooltip.display txt
+        ..on \mouseout -> tooltip.hide!
+
+selectParty = (party) ->
+    currentParty := party
+    currentYearOptions :=
+        | parties[party].years => that
+        | otherwise            => allYears
+    if currentYear not in currentYearOptions
+        currentYear := currentYearOptions[currentYearOptions.length - 1]
+    updateYearSelector currentYearOptions
+    selectLayer currentParty, currentYear
+
+selectLayer = (party, year) ->
     if currentLayer
         lastLayer = currentLayer
         setTimeout do
@@ -33,20 +64,71 @@ selectLayer = (id) ->
                 map.removeLayer lastLayer.map
                 map.removeLayer lastLayer.grid
             300
-    map.addLayer layers[id]
-    map.addLayer grids[id]
-    $year.html years[id]
+    layer = getLayer party, year
+    grid  = getGrid party, year
+
+    map.addLayer layer
+    map.addLayer grid
+    $year.html year
+    drawLegend party
     currentLayer :=
-        map: layers[id]
-        grid: grids[id]
+        map: layer
+        grid: grid
 
 
 opts =
     min: 0
     max: years.length - 1
-    value: firstYearIndex
+    value: years[years.length - 1]
     slide: (evt, ui) ->
-        selectLayer ui.value
+        currentYear := currentYearOptions[ui.value]
+        selectLayer currentParty, currentYear
+
+parties =
+    vitezove:
+        name: "Vítězové voleb"
+    ods:
+        name: \ODS
+        colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
+        values: [0, 0.06, 0.12, 0.18, 0.24, 0.30, 0.36, 0.43, 0.79]
+    cssd:
+        name: \ČSSD
+        colors: <[ #FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506 ]>
+        values: [0, 0.06, 0.12, 0.18, 0.24, 0.3, 0.36, 0.42, 1]
+    kscm:
+        name: \KSČM
+        colors: <[#FFF5F0 #FEE0D2 #FCBBA1 #FC9272 #FB6A4A #EF3B2C #CB181D #A50F15 #67000D ]>
+        values: [0, 0.046, 0.093, 0.139, 0.185, 0.231, 0.278, 0.330, 0.698]
+    vv:
+        name: \VV
+        colors: <[ #F7FBFF #DEEBF7 #C6DBEF #9ECAE1 #6BAED6 #4292C6 #2171B5 #08519C #08306B  ]>
+        values: [0, 0.022, 0.044, 0.066, 0.088, 0.111, 0.133, 0.158, 0.358]
+        years: [2010]
+    kdu:
+        name: "KDU-ČSL"
+        colors: <[#FFFFE5 #FFF7BC #FEE391 #FEC44F #FE9929 #EC7014 #CC4C02 #993404 #662506 ]>
+        values: [0, 0.037, 0.075, 0.112, 0.149, 0.187, 0.224, 0.267, 0.819]
+    sz:
+        name: \SZ
+        colors: <[#F7FCF5 #E5F5E0 #C7E9C0 #A1D99B #74C476 #41AB5D #238B45 #006D2C #00441B ]>
+        values: [0, 0.011, 0.022, 0.034, 0.045, 0.057, 0.068, 0.081, 0.33]
+        years: [1998 2002 2006 2010]
+    oda:
+        name: \ODA
+        colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858 ]>
+        values: [0, 0.012, 0.023, 0.035, 0.047, 0.059, 0.070, 0.084, 0.346]
+        years: [1996 2002]
+    top:
+        name: "TOP 09"
+        colors: <[#F7F4F9 #E7E1EF #D4B9DA #C994C7 #DF65B0 #E7298A #CE1256 #980043 #67001F ]>
+        values: [0, 0.030, 0.061, 0.091, 0.121, 0.151, 0.182, 0.216, 0.491]
+        years: [2010]
+    spr:
+        name: "SPR-RSČ"
+        colors: <[#FFF7F3 #FDE0DD #FCC5C0 #FA9FB5 #F768A1 #DD3497 #AE017E #7A0177 #49006A ]>
+        values: [0, 0.021, 0.042, 0.063, 0.084, 0.105, 0.126, 0.15, 0.5]
+        years: [1996 1998]
+
 $body = $ \body
 $slider = $ "<div></div>"
     ..addClass "slider"
@@ -57,18 +139,68 @@ $year = $ "<span></span>"
     ..addClass "year"
     ..appendTo $body
 
-selectLayer firstYearIndex
 $gradientContainer = $ "<div></div>"
     ..addClass \gradientContainer
     ..appendTo $body
-colors = <[#FFF5F0 #FEE0D2 #FCBBA1 #FC9272 #FB6A4A #EF3B2C #CB181D #A50F15 #67000D]>
-values = [0 0.04 0.08 0.12 0.18 0.22 0.24 0.4 0.7]
-for color, index in colors
-    value = values[index]
-    ele = $ "<div></div>"
-        ..css \background color
-        ..html "#{Math.round value * 100}%"
-        ..appendTo $gradientContainer
+$partySelectorContainer = $ "<div></div>"
+    ..addClass \partySelectorContainer
+    ..appendTo $body
+$partySelector = $ "<select>"
+    ..appendTo $partySelectorContainer
+    ..on \change ->
+        selectParty @value
 
-    if index >= 5
-        ele.addClass \dark
+for id, props of parties
+    $ "<option value='#id'>#{props.name}</option>"
+        ..appendTo $partySelector
+$partySelector.chosen!
+
+drawLegend = (party) ->
+    $gradientContainer.empty!
+    {values, colors} = parties[party]
+    return if not colors
+    for color, index in colors
+        value = values[index]
+        ele = $ "<div></div>"
+            ..css \background color
+            ..html "#{Math.round value * 100}%"
+            ..appendTo $gradientContainer
+
+        if index >= 5
+            ele.addClass \dark
+
+updateYearSelector = (years) ->
+    if years.length == 1
+        $slider.addClass \disabled
+    else
+        $slider.removeClass \disabled
+    $slider.slider "option" "max" years.length - 1
+
+geocoder = null
+geocodeMarker = null
+L.Icon.Default.imagePath = "http://service.ihned.cz/js/leaflet/images"
+geocode = (address, cb) ->
+    (results, status) <~ geocoder.geocode {address}
+    return cb status if status isnt google.maps.GeocoderStatus.OK
+    return cb 'no-results' unless results?.length > 0
+    result = results[0]
+    latlng = new L.LatLng do
+        result.geometry.location.lat!
+        result.geometry.location.lng!
+    map.setView latlng, 10
+    if geocodeMarker == null
+        geocodeMarker := L.marker latlng
+            ..on \mouseover -> map.removeLayer geocodeMarker
+    geocodeMarker
+        ..addTo map
+        ..setLatLng latlng
+    cb null
+$ '.search form' .on \submit (evt) ->
+    geocoder ?:= new google.maps.Geocoder();
+    evt.preventDefault!
+    address = $ '.search input' .val!
+    _gaq.push ['_trackEvent' 'geocode' address]
+    (err) <~ geocode address
+    if err
+        alert "Bohužel danou adresu se nám nepodařilo nalézt."
+selectParty currentParty, currentYear
