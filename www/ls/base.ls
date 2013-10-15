@@ -13,7 +13,7 @@ currentParty = \vitezove
 currentLayer = null
 getLayer = (party, year) ->
     L.tileLayer do
-        *   "../data/#party-#year/{z}/{x}/{y}.png"
+        *   "#party-#year/{z}/{x}/{y}.png"
         *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
             zIndex: 1
 
@@ -27,7 +27,7 @@ map.on \zoomend ->
     | otherwise         => map.removeLayer mapLayer
 
 getGrid = (party, year) ->
-    new L.UtfGrid "../data/#party-#year/{z}/{x}/{y}.json", useJsonP: no
+    new L.UtfGrid "#party-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
             {name, year, partyResults} = e.data
             txt = switch
