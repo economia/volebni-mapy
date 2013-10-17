@@ -128,7 +128,9 @@ parties =
         colors: <[#FFF7F3 #FDE0DD #FCC5C0 #FA9FB5 #F768A1 #DD3497 #AE017E #7A0177 #49006A ]>
         values: [0, 0.021, 0.042, 0.063, 0.084, 0.105, 0.126, 0.15, 0.5]
         years: [1996 1998]
-
+hashParty = location.hash.substr 1
+if parties.hasOwnProperty hashParty
+    currentParty = hashParty
 $body = $ \body
 $slider = $ "<div></div>"
     ..addClass "slider"
