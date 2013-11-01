@@ -9,7 +9,7 @@ map = L.map do
 allYears = years = [1996 1998 2002 2006 2010 2013]
 currentYearOptions = allYears
 currentYear = 2013
-currentParty = \nevolici
+currentParty = \koalice
 currentLayer = null
 srcPrefix = "../data"
 getLayer = (party, year) ->
@@ -97,6 +97,8 @@ parties =
         name: "Vítězové voleb"
     koalice:
         name: "Vládní koalice"
+        colors: <[#0571B0 #CA0020]>
+        values: <[koal opo. ]>
     nevolici:
         name: "Nevoliči"
         colors: <[#FFFFFF #F0F0F0 #D9D9D9 #BDBDBD #969696 #737373 #525252 #252525 #000000]>
@@ -176,10 +178,13 @@ drawLegend = (party) ->
     {values, colors} = parties[party]
     return if not colors
     for color, index in colors
-        value = values[index]
+        value = if party == \koalice
+             values[index]
+        else
+            "#{Math.round values[index] * 100}%"
         ele = $ "<div></div>"
             ..css \background color
-            ..html "#{Math.round value * 100}%"
+            ..html "#{value}"
             ..appendTo $gradientContainer
 
         if index >= 5
