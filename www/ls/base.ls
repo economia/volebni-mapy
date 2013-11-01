@@ -9,7 +9,7 @@ map = L.map do
 allYears = years = [1996 1998 2002 2006 2010 2013]
 currentYearOptions = allYears
 currentYear = 2013
-currentParty = \koalice
+currentParty = \nevolici
 currentLayer = null
 srcPrefix = "../data"
 getLayer = (party, year) ->
@@ -45,10 +45,10 @@ getGrid = (party, year) ->
                     out = for {abbr, percent, count} in partyResults
                         if count is null or count is void
                             "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
-                        if currentParty == \vitezove
-                            "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
-                        else
-                            "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+                        switch currentParty
+                        | \vitezove => "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+                        | \nevolici => "<b>#{name}</b>: v roce #{year} nešlo k volbám #{(percent * 100).toFixed 2}% voličů (#{count} lidí)"
+                        | otherwise => "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
 
                 out.join ""
             tooltip.display txt
@@ -97,6 +97,10 @@ parties =
         name: "Vítězové voleb"
     koalice:
         name: "Vládní koalice"
+    nevolici:
+        name: "Nevoliči"
+        colors: <[#FFFFFF #F0F0F0 #D9D9D9 #BDBDBD #969696 #737373 #525252 #252525 #000000]>
+        values: [0 0.068 0.134 0.200 0.268 0.335 0.402 0.478 1]
     ods:
         name: \ODS
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
