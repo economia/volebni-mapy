@@ -6,14 +6,15 @@ map = L.map do
         zoom: 7,
         center: [49.7, 15.5]
 
-allYears = years = [1996 1998 2002 2006 2010]
+allYears = years = [1996 1998 2002 2006 2010 2013]
 currentYearOptions = allYears
-currentYear = 2010
-currentParty = \vitezove
+currentYear = 2013
+currentParty = \koalice
 currentLayer = null
+srcPrefix = "../data"
 getLayer = (party, year) ->
     L.tileLayer do
-        *   "#party-#year/{z}/{x}/{y}.png"
+        *   "#srcPrefix/#party-#year/{z}/{x}/{y}.png"
         *   attribution: '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/cz/" target = "_blank">CC BY-NC-SA 3.0 CZ</a> <a target="_blank" href="http://ihned.cz">IHNED.cz</a>, data <a target="_blank" href="http://www.volby.cz">ČSÚ</a>'
             zIndex: 1
 
@@ -27,20 +28,27 @@ map.on \zoomend ->
     | otherwise         => map.removeLayer mapLayer
 
 getGrid = (party, year) ->
-    new L.UtfGrid "#party-#year/{z}/{x}/{y}.json", useJsonP: no
+    new L.UtfGrid "#srcPrefix/#party-#year/{z}/{x}/{y}.json", useJsonP: no
         ..on \mouseover (e) ->
             {name, year, partyResults} = e.data
             txt = switch
             | e.data.id == "592935" and year <= 1998
                 "V roce #{e.data.year} zde nikdo nevolil"
             | otherwise
-                out = for {abbr, percent, count} in partyResults
-                    if count is null or count is void
-                        "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
-                    if currentParty == \vitezove
-                        "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
-                    else
-                        "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+                if currentParty == \koalice
+                    out = ["<b>#{name}</b>, rok #year<br />"]
+                    for side, index in partyResults
+                        out.push "<b>#{if index == 0 then 'Koalice' else 'Opozice'}</b></br />"
+                        for {abbr, percent, count} in side
+                            out.push "#{abbr}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)<br />"
+                else
+                    out = for {abbr, percent, count} in partyResults
+                        if count is null or count is void
+                            "<b>#{name}</b>: #{abbr} zde v roce #{year} nekandidovali"
+                        if currentParty == \vitezove
+                            "<b>#{name}</b>: v roce #{year} zvítězila #{abbr}, #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
+                        else
+                            "<b>#{name}</b>: volební výsledek #{abbr} v roce #{year}: #{(percent * 100).toFixed 2}%  (#{count} hlasů)"
 
                 out.join ""
             tooltip.display txt
@@ -87,6 +95,8 @@ opts =
 parties =
     vitezove:
         name: "Vítězové voleb"
+    koalice:
+        name: "Vládní koalice"
     ods:
         name: \ODS
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
