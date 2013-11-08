@@ -98,7 +98,7 @@ parties =
     koalice:
         name: "Vládní koalice"
         colors: <[#0571B0 #CA0020]>
-        values: <[koal opo. ]>
+        values: <[koalice opozice]>
     nevolici:
         name: "Nevoliči"
         colors: <[#FFFFFF #F0F0F0 #D9D9D9 #BDBDBD #969696 #737373 #525252 #252525 #000000]>
@@ -194,7 +194,10 @@ for id, props of parties
 $partySelector.chosen!
 
 drawLegend = (party) ->
-    $gradientContainer.empty!
+    $gradientContainer
+        ..empty!
+        ..attr \class "gradientContainer #party"
+
     {values, colors} = parties[party]
     return if not colors
     for color, index in colors
