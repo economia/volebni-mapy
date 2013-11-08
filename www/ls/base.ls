@@ -9,7 +9,7 @@ map = L.map do
 allYears = years = [1996 1998 2002 2006 2010 2013]
 currentYearOptions = allYears
 currentYear = 2013
-currentParty = \koalice
+currentParty = \vitezove
 currentLayer = null
 srcPrefix = "../data"
 getLayer = (party, year) ->
@@ -103,6 +103,16 @@ parties =
         name: "Nevoliči"
         colors: <[#FFFFFF #F0F0F0 #D9D9D9 #BDBDBD #969696 #737373 #525252 #252525 #000000]>
         values: [0 0.068 0.134 0.200 0.268 0.335 0.402 0.478 1]
+    ano:
+        name: "ANO 2011"
+        colors: <[#F7FCF0 #E0F3DB #CCEBC5 #A8DDB5 #7BCCC4 #4EB3D3 #2B8CBE #0868AC #084081]>
+        values: [0, 0.036, 0.073, 0.106, 0.145, 0.181, 0.218, 0.259, 0.525]
+        years: [2013]
+    usvit:
+        name: "Úsvit"
+        colors: <[#FFFFCC #FFEDA0 #FED976 #FEB24C #FD8D3C #FC4E2A #E31A1C #BD0026 #800026]>
+        values: [0, 0.017, 0.034, 0.05ě, 0.069, 0.086, 0.103, 0.123, 0.329]
+        years: [2013]
     ods:
         name: \ODS
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858]>
@@ -128,7 +138,7 @@ parties =
         name: \SZ
         colors: <[#F7FCF5 #E5F5E0 #C7E9C0 #A1D99B #74C476 #41AB5D #238B45 #006D2C #00441B ]>
         values: [0, 0.011, 0.022, 0.034, 0.045, 0.057, 0.068, 0.081, 0.33]
-        years: [1998 2002 2006 2010]
+        years: [1998 2002 2006 2010, 2013]
     oda:
         name: \ODA
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858 ]>
@@ -138,7 +148,7 @@ parties =
         name: "TOP 09"
         colors: <[#F7F4F9 #E7E1EF #D4B9DA #C994C7 #DF65B0 #E7298A #CE1256 #980043 #67001F ]>
         values: [0, 0.030, 0.061, 0.091, 0.121, 0.151, 0.182, 0.216, 0.491]
-        years: [2010]
+        years: [2010 2013]
     spr:
         name: "SPR-RSČ"
         colors: <[#FFF7F3 #FDE0DD #FCC5C0 #FA9FB5 #F768A1 #DD3497 #AE017E #7A0177 #49006A ]>
