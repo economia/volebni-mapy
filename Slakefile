@@ -8,6 +8,7 @@ externalScripts =
     \http://service.ihned.cz/js/leaflet/utfgrid.min.js
     \http://service.ihned.cz/js/jquery.min.js
     \http://service.ihned.cz/js/jq-ui/v1.10.3.autocomplete.slider.min.js
+    \http://service.ihned.cz/js/jq-ui/jquery.ui.touch-punch.v0.2.2.min.js
     \http://service.ihned.cz/js/chosen/chosen.jquery.min.js
 
 externalStyles =
