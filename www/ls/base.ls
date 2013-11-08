@@ -139,6 +139,16 @@ parties =
         colors: <[#F7FCF5 #E5F5E0 #C7E9C0 #A1D99B #74C476 #41AB5D #238B45 #006D2C #00441B ]>
         values: [0, 0.011, 0.022, 0.034, 0.045, 0.057, 0.068, 0.081, 0.33]
         years: [1998 2002 2006 2010, 2013]
+    svobodni:
+        name: \Svobodní
+        colors: <[#F7FCFD #E5F5F9 #CCECE6 #99D8C9 #66C2A4 #41AE76 #238B45 #006D2C #00441B ]>
+        values: [0, 0.004, 0.007, 0.011, 0.014, 0.0175, 0.021, 0.025, 0.186]
+        years: [2010 2013]
+    pirati:
+        name: \Piráti
+        colors: <[#FFFFFF #F0F0F0 #D9D9D9 #BDBDBD #969696 #737373 #525252 #252525 #000000 ]>
+        values: [0, 0.004, 0.008, 0.012, 0.016, 0.02, 0.024, 0.028, 0.152]
+        years: [2010 2013]
     oda:
         name: \ODA
         colors: <[#FFF7FB #ECE7F2 #D0D1E6 #A6BDDB #74A9CF #3690C0 #0570B0 #045A8D #023858 ]>
